@@ -12,9 +12,16 @@ const SecurityMiddleware = (app) => {
 	if (config.NODE_ENV === "development") {
 		app.use(morgan("dev"));
 	}
+	const allowedOrigins = [config.CLIENT_URL, config.CLIENT_URL_PROD];
 	app.use(
 		cors({
-			origin: config.CLIENT_URL,
+			origin: (origin, callback) => {
+				if (!origin || allowedOrigins.includes(origin)) {
+					callback(null, true);
+				} else {
+					callback(new Error("Not allowed by CORS"));
+				}
+			},
 			credentials: true,
 		}),
 	);
